@@ -7,11 +7,23 @@
     <title>Menu - Restaurant App</title>
 </head>
 <body>
-    <h1>Hello User</h1>
+    <h1>Hello <%= name %></h1>
     <ul>
-        <li>MENU 1</li>
-        <li>MENU 2</li>
-        <li>MENU 3</li>
+        <% for(var i = 0; i < items.length; i++) { %>
+            <li><%= items[i].name %> - <%= items[i].price %> € <a href="/addToCart/<%=i%>"><button>ADD</button></a></li>
+        <% } %>
     </ul>
+    <section>
+        <% if (locals.cartError) { %>
+            <span>Vous avais attends le plafond de votre budget</span>
+        <% } %>
+        <span></span>
+        <h2>Panier : <%= total %> €</h2>
+        <ul>
+            <% for(var i = 0; i < cart.length; i++) { %>
+                <li><%= cart[i].name %> - <%= cart[i].price %> € <a href="/removeItem/<%=i%>"><button>REMOVE</button></a></li>
+            <% } %>
+        </ul>
+    </section>
 </body>
 </html>
