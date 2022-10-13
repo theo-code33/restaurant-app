@@ -9,14 +9,11 @@ app.use(morgan('dev'))
 app.set('view engine', 'ejs')
 
 const items = [
-    { id: 0, name: 'Brezel', price: 1.70, majorOnly: false },
-    { id: 1, name: 'Frites', price: 3.99, majorOnly: true },
-    { id: 2, name: 'Tiramisu', price: 5.50, majorOnly: false },
-    { id: 3, name: 'Cheese', price: 5.99, majorOnly: true },
-    { id: 4, name: 'Saumon', price: 16.99, majorOnly: false },
-    { id: 5, name: 'Steak Frites', price: 13.40, majorOnly: false },
-    { id: 6, name: 'Croque Monsieur', price: 8.99, majorOnly: true },
-    { id: 7, name: 'Salade de pâtes', price: 10.99, majorOnly: false }
+    { id: 0, name: 'Plat du jour', price: 19.90, majorOnly: false },
+    { id: 1, name: 'Sandwich', price: 6, majorOnly: false },
+    { id: 2, name: 'Milshake', price: 3, majorOnly: false },
+    { id: 3, name: 'Coca', price: 2, majorOnly: false },
+    { id: 4, name: 'Boisson alcoolisé', price: 16.99, majorOnly: true }
 ]
 
 const user = {}
