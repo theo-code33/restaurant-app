@@ -9,7 +9,11 @@ app.use(morgan('dev'))
 app.set('view engine', 'ejs')
 
 app.get('/', (req, res) => {
-    res.send('Hello Restau app')
+    res.render('form')
+})
+
+app.get('/getMenu', (req, res) => {
+    res.render('menu')
 })
 
 app.listen(port, () => {
