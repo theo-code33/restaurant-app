@@ -13,7 +13,7 @@ const items = [
     { id: 1, name: 'Sandwich', price: 6, majorOnly: false },
     { id: 2, name: 'Milshake', price: 3, majorOnly: false },
     { id: 3, name: 'Coca', price: 2, majorOnly: false },
-    { id: 4, name: 'Boisson alcoolisé', price: 16.99, majorOnly: true }
+    { id: 4, name: 'Boisson alcoolisé', price: 7, majorOnly: true }
 ]
 
 const user = {}
@@ -77,6 +77,7 @@ app.get('/getMenu', (req, res) => {
     user.budget = budget
     user.cart = []
     user.totalCart = 0
+    console.log(name);
     isMinor(user, res, user.totalCart, items)
 })
 
