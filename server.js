@@ -1,5 +1,10 @@
+require('dotenv').config()
 const express = require("express")
 const morgan = require("morgan")
+const mongoose = require('mongoose')
+const models = require('./models/index');
+const Recipes = models.recipes
+const Cart = models.cart
 
 const app = express()
 
@@ -7,6 +12,22 @@ const port = process.env.PORT || 8000
 
 app.use(morgan('dev'))
 app.set('view engine', 'ejs')
+
+const username_bdd = process.env.USERNAME_BDD;
+const password_bdd = process.env.PASSWORD_BDD;
+const cluster_name = process.env.CLUSTER_NAME;
+const port_bdd = process.env.PORT_BDD;
+
+mongoose.connect(`mongodb://${username_bdd}:${password_bdd}@${cluster_name}:${port_bdd}/?retryWrites=true&w=majority`, { useNewUrlParser: true });
+const db = mongoose.connection;
+
+mongoose.connection.on('error', (err) => {
+    console.error("Connection error", err);
+    process.exit();
+})
+mongoose.connection.once('open', () => {
+    console.log("Successfully connect to MongoDB.");
+})
 
 const items = [
     { id: 0, name: 'Today\'s special', price: 19.90, majorOnly: false },
@@ -97,5 +118,3 @@ app.get('/removeItem/:id', (req, res) => {
 app.listen(port, () => {
     console.log(`App running on port ${port}, http://localhost:${port}`);
 })
-
-

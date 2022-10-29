@@ -7,5 +7,5 @@ services:
     ports:
       - 27017:27017
     environment:
-      MONGO_INITDB_ROOT_USERNAME: mongoroot
-      MONGO_INITDB_ROOT_PASSWORD: mongoroot
+      MONGO_INITDB_ROOT_USERNAME: ${USERNAME_BDD}
+      MONGO_INITDB_ROOT_PASSWORD: ${PASSWORD_BDD}

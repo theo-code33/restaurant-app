@@ -11,6 +11,9 @@
             align-items: flex-start;
             justify-content: space-between;
         }
+        .cart-container{
+            width: 30%;
+        }
     </style>
 </head>
 <body>
@@ -21,7 +24,7 @@
                 <li><%= items[i].name %> - <%= items[i].price %> € <a href="/addToCart/<%=i%>"><button>ADD</button></a></li>
             <% } %>
         </ul>
-        <div>
+        <div class="cart-container">
             <% if (locals.cartError) { %>
                 <span>Vous avais attends le plafond de votre budget</span>
             <% } %>
