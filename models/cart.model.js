@@ -9,3 +9,4 @@ const Cart = mongoose.model('Cart',
         ]
     })
 )
+module.exports = Cart

@@ -27,17 +27,43 @@ mongoose.connection.on('error', (err) => {
 })
 mongoose.connection.once('open', () => {
     console.log("Successfully connect to MongoDB.");
+    initial()
 })
 
 const items = [
-    { id: 0, name: 'Today\'s special', price: 19.90, majorOnly: false },
-    { id: 1, name: 'Sandwich', price: 6, majorOnly: false },
-    { id: 2, name: 'Milshake', price: 3, majorOnly: false },
-    { id: 3, name: 'Coca', price: 2, majorOnly: false },
-    { id: 4, name: 'Alcoholic drink', price: 7, majorOnly: true }
+    { name: 'Today\'s special', price: 19.90, majorOnly: false },
+    { name: 'Sandwich', price: 6, majorOnly: false },
+    { name: 'Milshake', price: 3, majorOnly: false },
+    { name: 'Coca', price: 2, majorOnly: false },
+    { name: 'Alcoholic drink', price: 7, majorOnly: true }
 ]
+function createItem(item){
+    const newItem = new Recipes({
+        name: item.name,
+        price: item.price,
+        majorOnly: item.majorOnly
+    })
+    newItem.save( err => {
+        if(err){
+            console.log("Error:", err);
+        }
+        console.log("Saved recipe to database.");
+    })
+}
+
+function initial(){
+    Recipes.estimatedDocumentCount((err, count) => {
+        if(!err && count === 0){
+            items.forEach(item => {
+                createItem(item)
+            })
+        }
+    })
+}
 
 const user = {}
+
+
 
 const verifyBudget = (res, totalCart, itemPrice, itemsList, user, index) => {
     if (totalCart < parseFloat(user.budget) && totalCart + itemPrice < parseFloat(user.budget)){
@@ -96,10 +122,20 @@ app.get('/getMenu', (req, res) => {
     user.name = name
     user.age = age
     user.budget = budget
-    user.cart = []
+    user.cart = Cart.find({}, (err, cart) => {
+        if(err){
+            console.log(err)
+        }else{
+            return cart
+        }
+    })
     user.totalCart = 0
-    console.log(name);
-    isMinor(user, res, user.totalCart, items)
+    Recipes.find({}, (err, recipes) => {
+        if(err){
+            console.log("Error:", err);
+        }
+        isMinor(user, res, user.totalCart, recipes)
+    })
 })
 
 app.get('/addToCart/:id', (req, res) => {
