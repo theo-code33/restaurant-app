@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Recipes = mongoose.model('Recipes', 
+const Recipes = mongoose.model('Recipes',
     new mongoose.Schema({
         name: String,
         price: Number,

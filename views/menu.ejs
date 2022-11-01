@@ -21,7 +21,7 @@
     <section class="container">
         <ul>
             <% for(var i = 0; i < items.length; i++) { %>
-                <li><%= items[i].name %> - <%= items[i].price %> € <a href="/addToCart/<%=i%>"><button>ADD</button></a></li>
+                <li><%= items[i].name %> - <%= items[i].price %> € <a href="/addToCart/<%= items[i]._id%>"><button>ADD</button></a></li>
             <% } %>
         </ul>
         <div class="cart-container">
@@ -32,7 +32,7 @@
             <h2>Cart : <%= total %> €</h2>
             <ul>
                 <% for(var i = 0; i < cart.length; i++) { %>
-                    <li><%= cart[i].name %> - <%= cart[i].price %> € <a href="/removeItem/<%=i%>"><button>REMOVE</button></a></li>
+                    <li><%= cart[i].name %> - <%= cart[i].price %> € <a href="/removeItem/<%=cart[i]._id%>"><button>REMOVE</button></a></li>
                 <% } %>
             </ul>
         </div>
