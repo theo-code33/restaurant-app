@@ -38,6 +38,15 @@ const items = [
     { name: 'Coca', price: 2, majorOnly: false },
     { name: 'Alcoholic drink', price: 7, majorOnly: true }
 ]
+function initial(){
+    Recipes.estimatedDocumentCount((err, count) => {
+        if(!err && count === 0){
+            items.forEach(item => {
+                createItem(item)
+            })
+        }
+    })
+}
 function createItem(item){
     const newItem = new Recipes({
         name: item.name,
@@ -51,7 +60,7 @@ function createItem(item){
         console.log("Saved recipe to database.");
     })
 }
-function addToCart(id, name, price, user, list, res){
+function addToCart(id, name, price, user, res){
     const newItem = new Cart({
         name: name,
         price: price,
@@ -62,94 +71,68 @@ function addToCart(id, name, price, user, list, res){
             console.log("Error:", err);
         }
         console.log("Saved recipe in cart collections.");
-        const cartData = Cart.find({}, (err, cart) => {
+        Cart.find({}, (err, cart) => {
             if(err){
                 console.log("Error:", err);
             }else{
                 user.cart = [...cart]
-                console.log("Cart:", user.cart);
-                res.render('menu', {
-                    name: user.name,
-                    items: list,
-                    cart: user.cart,
-                    total: parseFloat(user.totalCart).toFixed(2),
-                })
+                res.redirect('/getMenu?firstName=' + user.name + '&age=' + user.age + '&budget=' + user.budget)
             }
         })
     })
 }
 
-function initial(){
-    Recipes.estimatedDocumentCount((err, count) => {
-        if(!err && count === 0){
-            items.forEach(item => {
-                createItem(item)
-            })
-        }
-    })
-}
-
 const user = {}
 
-const verifyBudget = async (res, totalCart, itemsList ,user, index) => {
+const verifyBudget = async (res, totalCart ,user, index) => {
     Recipes.findById(index, async (err, item) => {
         if(err){
             console.log("Error:", err);
         }else{
             if (totalCart < parseFloat(user.budget) && totalCart + item.price < parseFloat(user.budget)){
                 user.totalCart += item.price
-                await addToCart(item._id, item.name, item.price, user, itemsList, res)
+                await addToCart(item._id, item.name, item.price, user, res)
             }else{
-                res.render('menu', {
-                    name: user.name,
-                    items: itemsList,
-                    cart: user.cart,
-                    total: parseFloat(user.totalCart).toFixed(2),
-                    cartError: true
-                })
+                user.error = true
+                res.redirect('/getMenu?firstName=' + user.name + '&age=' + user.age + '&budget=' + user.budget + '&error=' + user.error)
             }
         }
     })
 }
 
-const isMinor = (user, res, total, list, checkBudget, index) => {
+const isMinor = (user, res, total, list) => {
     if (user.age < 18){
         let itemsYoung = list.filter(item => !item.majorOnly)
-        if(checkBudget){
-            checkBudget(res, total, itemsYoung, user, index)
-        }else{
-            Cart.find({}, (err, cart) => {
-                if(err){
-                    console.log("Error:", err);
-                }else{
-                    user.cart = [...cart]
-                    res.render('menu', {
-                        name: user.name,
-                        items: itemsYoung,
-                        cart: user.cart,
-                        total: parseFloat(user.totalCart).toFixed(2),
-                    })
-                }
-            })
-        }
+        Cart.find({}, (err, cart) => {
+            if(err){
+                console.log("Error:", err);
+            }else{
+                user.cart = [...cart]
+                res.render('menu', {
+                    name: user.name,
+                    items: itemsYoung,
+                    cart: user.cart,
+                    total: parseFloat(user.totalCart).toFixed(2),
+                    error: user.error
+                })
+            }
+        })
+        
     }else{
-        if(checkBudget){
-            checkBudget(res, total, list, user, index)
-        }else{
-            Cart.find({}, (err, cart) => {
-                if(err){
-                    console.log("Error:", err);
-                }else{
-                    user.cart = [...cart]
-                    res.render('menu', {
-                        name: user.name,
-                        items: list,
-                        cart: user.cart,
-                        total: parseFloat(user.totalCart).toFixed(2),
-                    })
-                }
-            })
-        }
+        Cart.find({}, (err, cart) => {
+            if(err){
+                console.log("Error:", err);
+            }else{
+                user.cart = [...cart]
+                res.render('menu', {
+                    name: user.name,
+                    items: list,
+                    cart: user.cart,
+                    total: parseFloat(user.totalCart).toFixed(2),
+                    error: user.error
+                })
+            }
+        })
     }
 }
 
@@ -163,18 +146,19 @@ app.get('/', (req, res) => {
 })
 
 app.get('/getMenu', (req, res) => {
-    const { firstName: name, age, budget } = req.query
+    const { firstName: name, age, budget, error } = req.query
     user.name = name
     user.age = age
     user.budget = budget
     user.totalCart = 0
+    user.error = error
     Cart.find({}, (err, cart) => {
         if(err){
             console.log("Error:", err);
         }
         user.cart = [...cart]
         if(user.cart.length > 0){
-            cart.map(item => {
+            cart.forEach(item => {
                 user.totalCart += item.price
             })
         }else{
@@ -192,12 +176,7 @@ app.get('/getMenu', (req, res) => {
 
 app.get('/addToCart/:id', (req, res) => {
     const { id } = req.params
-    Recipes.find({}, (err, recipes) => {
-        if(err){
-            console.log("Error:", err);
-        }
-        isMinor(user, res, user.totalCart, recipes, verifyBudget, id)
-    })
+    verifyBudget(res, user.totalCart, user, id)
 })
 
 app.get('/removeItem/:id', (req, res) => {
@@ -206,13 +185,9 @@ app.get('/removeItem/:id', (req, res) => {
         if(err){
             console.log("Error:", err);
         }
+        user.error = false
         user.totalCart -= cart.price
-        Recipes.find({}, (err, recipes) => {
-            if(err){
-                console.log("Error:", err);
-            }
-            isMinor(user, res, parseFloat(user.totalCart).toFixed(2), recipes)
-        })
+        res.redirect('/getMenu?firstName=' + user.name + '&age=' + user.age + '&budget=' + user.budget)
     })
 })
 
