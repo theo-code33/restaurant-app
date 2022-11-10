@@ -15,6 +15,11 @@ ___
 
 1. Clone the repo
 2. Run `npm install`
-3. Open Docker app
-4. Run `docker-compose up -d`
-5. Run `npm start`
+3. Create .env file and add the following variables
+    - USERNAME_BDD
+    - PASSWORD_BDD
+    - CLUSTER_NAME
+    - PORT_BDD
+4. Open Docker app
+5. Run `docker-compose up -d`
+6. Run `npm start`
