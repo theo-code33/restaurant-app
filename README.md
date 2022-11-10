@@ -23,3 +23,8 @@ ___
 4. Open Docker app
 5. Run `docker-compose up -d`
 6. Run `npm start`
+
+___
+## To stop the app
+
+1. Run `docker-compose down`
